@@ -1,0 +1,394 @@
+{% extends 'admin/base.html' %}
+{% block content %}
+    <style>
+        textarea {
+            font-family: 'Courier New', monospace;
+            font-size: 12px !important;
+            white-space: pre;
+            overflow-x: auto;
+        }
+    </style>
+
+    <link href="../static/css/vis.min.css" rel="stylesheet" type="text/css"/>
+    <script src="../static/js/socket.io.js"></script>
+    <script src="../static/js/vis.min.js"></script>
+    <div class="row g-3 mb-4 align-items-center justify-content-between">
+        <div class="col-auto">
+            <h1 class="app-page-title mb-0">Overview</h1>
+        </div>
+
+
+    </div><!--//row-->
+
+
+
+    <div class="tab-content" id="orders-table-tab-content">
+        <div class="tab-pane fade show active" id="orders-all" role="tabpanel" aria-labelledby="orders-all-tab">
+            <div class="app-card app-card-orders-table shadow-sm mb-5">
+                <div class="app-card-body">
+                    <div class="row">
+                        <div class="col">
+                            <input class="form-control" id="groupFilter" type="text"
+                                   placeholder="Filter by controller name...">
+                        </div>
+                        <div class="col-auto">
+                            <a class="btn app-btn-secondary" id="toggleAutoScroll1">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                     class="bi bi-arrow-bar-down" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd"
+                                          d="M1 3.5a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13a.5.5 0 0 1-.5-.5zM8 6a.5.5 0 0 1 .5.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 0 1 .708-.708L7.5 12.293V6.5A.5.5 0 0 1 8 6z"/>
+                                </svg>
+                                <span id="autoScrollText1">Auto-Scroll On</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div id="visualization" style="max-height: 500px; overflow-y: auto;"></div>
+
+
+                </div><!--//row-->
+            </div><!--//row-->
+        </div><!--//row-->
+    </div><!--//row-->
+    <div class="tab-content" id="orders-table-tab-content">
+        <div class="tab-pane fade show active" id="orders-all" role="tabpanel" aria-labelledby="orders-all-tab">
+            <div class="app-card app-card-orders-table shadow-sm mb-5">
+                <div class="app-card-body">
+                    <div class="row">
+                        <div class="col">
+                            <input class="form-control" id="filter-input" type="text"
+                                   placeholder="Filter by controller name...">
+                        </div>
+                        <div class="col-auto">
+                            <a class="btn app-btn-secondary" id="toggleAutoScroll2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                     class="bi bi-arrow-bar-down" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd"
+                                          d="M1 3.5a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13a.5.5 0 0 1-.5-.5zM8 6a.5.5 0 0 1 .5.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 0 1 .708-.708L7.5 12.293V6.5A.5.5 0 0 1 8 6z"/>
+                                </svg>
+                                <span id="autoScrollText2">Auto-Scroll On</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <textarea class="form-control" id="data-textarea" rows="10" readonly></textarea>
+
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <script>
+
+        window.onload = function () {
+
+            var autoScroll1 = true;
+            var autoScroll2 = true;
+
+            function formatDate(date) {
+                let day = String(date.getDate()).padStart(2, '0');
+                let month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based in JavaScript
+                let hours = String(date.getHours()).padStart(2, '0');
+                let minutes = String(date.getMinutes()).padStart(2, '0');
+                let seconds = String(date.getSeconds()).padStart(2, '0');
+
+                return `${day}/${month} ${hours}:${minutes}:${seconds}`;
+            }
+
+            function formatDate2(date) {
+                let hours = String(date.getHours()).padStart(2, '0');
+                let minutes = String(date.getMinutes()).padStart(2, '0');
+                let seconds = String(date.getSeconds()).padStart(2, '0');
+                let milliseconds = String(date.getMilliseconds()).padStart(3, '0'); // Milliseconds are from 0 to 999
+
+                return `${hours}:${minutes}:${seconds}.${milliseconds}`;
+            }
+
+
+            document.getElementById('toggleAutoScroll1').addEventListener('click', function () {
+                autoScroll1 = !autoScroll1;
+                var span = document.getElementById('autoScrollText1');
+                if (autoScroll1) {
+                    // Change the text to show that auto-scroll is enabled
+                    span.textContent = 'Auto-Scroll On';
+                } else {
+                    // Change the text to show that auto-scroll is disabled
+                    span.textContent = 'Auto-Scroll Off';
+                }
+            });
+            document.getElementById('toggleAutoScroll2').addEventListener('click', function () {
+                autoScroll2 = !autoScroll2;
+                var span = document.getElementById('autoScrollText2');
+                if (autoScroll2) {
+                    // Change the text to show that auto-scroll is enabled
+                    span.textContent = 'Auto-Scroll On';
+                } else {
+                    // Change the text to show that auto-scroll is disabled
+                    span.textContent = 'Auto-Scroll Off';
+                }
+            });
+            // DOM element where the Timeline will be attached
+            var container = document.getElementById('visualization');
+            // Create a DataSet (allows two way data-binding)
+            var groups = new vis.DataSet([
+                {% for controller in controller_names %}
+                    {id: '{{ controller.id }}', content: '{{ controller.controller_name }}'},
+                {% endfor %}
+            ]);
+
+            var input = document.getElementById('groupFilter');
+
+            input.addEventListener('input', function () {
+                var filter = input.value.toLowerCase();
+
+                groups.forEach(function (group) {
+                    var match = group.content.toLowerCase().includes(filter);
+                    groups.update({id: group.id, visible: match});
+                });
+            });
+
+            var items = new vis.DataSet([]);
+
+            // Configuration for the Timeline
+            var options = {
+                start: new Date(Date.now() - 1000 * 60 * 1.5),  // One hour ago
+                end: new Date(Date.now() + 1000 * 60 * 1.5),  // One hour from now
+                format: {
+                    minorLabels: {
+                        millisecond: 'x',
+                        second: 's',
+                        minute: 'HH:mm:ss',
+                        hour: 'HH:mm:ss',
+                        weekday: 'HH:mm:ss',
+                        day: 'HH:mm:ss',
+                        month: 'HH:mm:ss',
+                        year: 'HH:mm:ss'
+                    }
+                },
+                margin: {
+                    item: 5,  // Change this to reduce the space between items
+                    axis: 5
+                }
+            };
+
+            // Create a Timeline
+            var timeline = new vis.Timeline(container, items, groups, options);
+
+            // Update the timeline every second to keep the current time in the center
+            setInterval(function () {
+                    var currentTime = new Date();
+                    items.forEach(function (item) {
+                        if (item.active) {
+                            if (item.end < currentTime) {
+                                item.end = currentTime;
+                                console.log(item.id);
+                                items.update(item);
+                            }
+
+
+                        }
+                        {#var progress = ((currentTime - item.start) / (item.end - item.start)) * 100;#}
+                        {#progress = Math.min(Math.max(Math.round(progress), 0), 100);  // Limit progress to 100%#}
+                        {#item.content = item.file_name + ' ' + progress + '%';#}
+                        {#items.update(item);#}
+                    });
+
+
+                    if (autoScroll1) {
+                        timeline.moveTo(currentTime, {animation: {duration: 200, easingFunction: 'linear'}});
+                    }
+                }
+                , 200);
+
+
+            var socket = io();
+            socket.on('connect', function () {
+                socket.emit('audio_history');
+                socket.emit('input_history2');
+                socket.emit('led_history');
+            });
+
+
+            socket.on('audio_data', function (data) {
+                console.log(data.audio)
+                addAudio(data.audio); // Store all incoming data
+                filterData();
+                if (data.audio.status === 'ADDED') {
+
+                    var startTime = new Date(data.audio.start_time);
+                    var item = {
+                        id: data.audio.file_name + '-' + startTime,  // Generate a unique ID for each item
+                        group: data.audio.controller_id,
+                        content: data.audio.file_name,
+                        start: startTime,
+                        end: new Date(data.audio.end_time),
+                        style: 'background-color: lightyellow; color: black;',
+                        title: data.audio.file_name + '<br>Speakers:' + data.audio.speakers
+                    };
+                    items.add(item);
+                }
+            });
+
+            function addAudio(data) {
+                var controller = data.controller_name + ",";
+                var starttime = "S: " + formatDate2(new Date(data.start_time))
+                var time_stamp = formatDate(new Date(data.timestamp)) + ","
+                var duration = "  D: " + ((Number(data.end_time) - Number(data.start_time))/1000).toFixed(2);
+                var status = data.status + ",";
+                var filename = data.file_name + ",";
+                var addr = data.ip + ",";
+                console.log(controller.padEnd(20).length)
+                var str_data =
+                    time_stamp.padEnd(17) +
+                    controller.padEnd(25) +
+                    " Audio: " +
+                    status.padEnd(16) +
+                    filename.padEnd(30) +
+                    starttime +
+                    duration
+                ;
+                allData.push({timestamp: data.timestamp, data: str_data});
+                filterData();
+            }
+
+            socket.on('input_data', function (data) {
+                console.log(data.input)
+                addInput(data.input)
+                let input_min_size = 2000;
+                if (data.input.status === 'RISING_EDGE') {
+                    var startTime = new Date(data.input.timestamp);
+                    var endTime = new Date(startTime.getTime() + input_min_size);
+                    // Add a new item with the start time as the timestamp and the end time as 5 seconds later
+                    var item = {
+                        id: data.input.ip + '-' + data.input.input_id,  // Generate a unique ID for each item
+                        group: data.input.controller_id,
+                        content: 'Input ' + (data.input.input_id).toString(),
+                        start: startTime,
+                        end: endTime,
+                        active: true,
+                        style: 'background-color: lightgreen; color: black;',
+                        title: 'Input ' + (data.input.input_id).toString(),
+                    };
+                    items.add(item);
+                } else if (data.input.status === 'FALLING_EDGE') {
+                    // Find the existing item
+                    var item = items.get(data.input.ip + '-' + data.input.input_id);
+                    if (item) {
+                        // Update the end time
+                        item.id = data.input.ip + '-' + data.input.input_id + Date.now()
+                        if ((data.input.timestamp - item.start) > input_min_size) {
+                            item.end = data.input.timestamp;
+                        }
+                        item.active = false;
+                        items.add(item);
+                    }
+                    items.remove(data.input.ip + '-' + data.input.input_id);
+
+                }
+
+
+            });
+
+
+            function addInput(data) {
+                var controller = data.controller_name + ",";
+                var time_stamp = formatDate(new Date(data.timestamp)) + ","
+                var status = data.status + ",";
+                var addr = data.ip + ",";
+                var str_data =
+                    time_stamp.padEnd(17) +
+                    controller.padEnd(25) +
+                    " Input: " +
+                    status.padEnd(46)
+
+                ;
+                allData.push({timestamp: data.timestamp, data: str_data});
+                filterData();
+            }
+
+
+            socket.on('led_data', function (data) {
+                console.log(data.led)
+                addLED(data.led)
+                if (data.led.status === 'ADDED') {
+
+                    var startTime = new Date(data.led.start_time);
+                    var item = {
+                        id: data.led.file_name + '-' + startTime,  // Generate a unique ID for each item
+                        group: data.led.controller_id,
+                        content: data.led.file_name,
+                        start: startTime,
+                        end: new Date(data.led.end_time),
+                        style: 'background-color: lightblue; color: black;',
+                        title: data.led.file_name + '<br>Universes:' + data.led.universes
+                    };
+                    items.add(item);
+                }
+            });
+
+            function addLED(data) {
+                var controller = data.controller_name + ",";
+                var starttime = "S: " + formatDate2(new Date(data.start_time))
+                var time_stamp = formatDate(new Date(data.timestamp)) + ","
+                var duration = "  D: " + ((Number(data.end_time) - Number(data.start_time))/1000).toFixed(2);
+                console.log(duration)
+                var status = data.status + ",";
+                var filename = data.file_name + ",";
+                var addr = data.ip + ",";
+                console.log(controller.padEnd(20).length)
+                var str_data =
+                    time_stamp.padEnd(17) +
+                    controller.padEnd(25) +
+                    " LED:   " +
+                    status.padEnd(16) +
+                    filename.padEnd(30) +
+                    starttime +
+                    duration
+                ;
+                allData.push({timestamp: data.timestamp, data: str_data});
+                filterData();
+            }
+
+            var allData = [];
+            document.getElementById('filter-input').addEventListener('input', filterData);
+            var autoScroll = true;
+
+
+            function filterData() {
+                // Get the filter value
+                var filter = document.getElementById('filter-input').value.toLowerCase();
+
+                // Filter the entries
+                var filteredEntries = allData.filter(function (entry) {
+                    // The controller name is now the fourth part of the entry
+                    var controllerName = entry.data.split(',')[1].trim().toLowerCase();
+
+                    // Only include the entry if the controller name includes the filter
+                    return controllerName.includes(filter);
+                });
+
+                // Sort the filtered entries by timestamp
+                filteredEntries.sort(function (a, b) {
+                    // Compare the timestamps
+                    return a.timestamp - b.timestamp;
+                });
+
+                // Convert the filtered entries back to strings
+                var filteredStrings = filteredEntries.map(function (entry) {
+                    return entry.data;
+                });
+
+                // Update the textarea with the filtered entries
+                var textarea = document.getElementById('data-textarea');
+                textarea.value = filteredStrings.join('\n');
+
+                // Scroll to the bottom of the textarea
+                if (autoScroll2) {
+                    textarea.scrollTop = textarea.scrollHeight;
+                }
+            }
+        }
+    </script>
+
+{% endblock %}

@@ -1,0 +1,201 @@
+{% extends "admin/base.html" %}
+
+
+{% block content %}
+    <style>
+        textarea {
+            font-family: 'Courier New', monospace;
+            font-size: 12px !important;
+            white-space: pre;
+            overflow-x: auto;
+        }
+    </style>
+    <script src="../../static/js/socket.io.js"></script>
+    <div class="row g-3 mb-4 align-items-center justify-content-between">
+        <div class="col-auto">
+            <h1 class="app-page-title mb-0">Inputs</h1>
+        </div>
+
+    </div><!--//row-->
+
+
+    <div class="tab-content" id="orders-table-tab-content">
+        <div class="tab-pane fade show active" id="orders-all" role="tabpanel" aria-labelledby="orders-all-tab">
+            <div class="app-card app-card-orders-table shadow-sm mb-5">
+                <div class="app-card-body">
+                    <div class="table-responsive">
+                        <table class="table app-table-hover mb-0 text-left">
+                            <thead>
+                            <tr>
+                                <th>Controller Name</th>
+                                <th>Inputs</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for controller in controller_names %}
+                                <tr id="controller-{{ controller.id }}"
+                                    data-href="{{ url_for('details_controller', controller_id=controller.id) }}">
+                                    <td>{{ controller.controller_name }}</td>
+                                    <td class="status">
+                                        {% for input_id in range(1, 17) %}
+                                            <button id="button-{{ controller.id }}-{{ input_id }}" type="button"
+                                                    class="btn btn-outline-success btn-rounded disabled"
+                                                    data-mdb-ripple-color="dark">{{ input_id }}</button>
+                                        {% endfor %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+
+                            </tbody>
+                        </table>
+                    </div><!--//table-responsive-->
+
+
+                </div><!--//app-card-body-->
+            </div><!--//app-card-->
+            <div class="tab-content" id="orders-table-tab-content">
+                <div class="tab-pane fade show active" id="orders-all" role="tabpanel" aria-labelledby="orders-all-tab">
+                    <div class="app-card app-card-orders-table shadow-sm mb-5">
+                        <div class="app-card-body">
+                            <div class="row">
+                                <div class="col">
+                                    <input class="form-control" id="filter-input" type="text"
+                                           placeholder="Filter by controller name...">
+                                </div>
+                                <div class="col-auto">
+                                    <a class="btn app-btn-secondary" id="toggleAutoScroll2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                             fill="currentColor"
+                                             class="bi bi-arrow-bar-down" viewBox="0 0 16 16">
+                                            <path fill-rule="evenodd"
+                                                  d="M1 3.5a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13a.5.5 0 0 1-.5-.5zM8 6a.5.5 0 0 1 .5.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 0 1 .708-.708L7.5 12.293V6.5A.5.5 0 0 1 8 6z"/>
+                                        </svg>
+                                        <span id="autoScrollText2">Auto-Scroll On</span>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <textarea class="form-control" id="data-textarea" rows="10" readonly></textarea>
+
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div><!--//tab-pane-->
+    </div><!--//tab-content-->
+    <script>
+
+        window.onload = function () {
+            var autoScroll2 = true;
+            var socket = io();
+            socket.on('connect', function () {
+                socket.emit('input_history');
+            });
+
+            socket.on('input_data', function (data) {
+                    console.log(data.input)
+                    addInput(data.input)
+                    let button = document.getElementById(`button-${data.input.controller_id}-${data.input.input_id}`);
+                    if (button) {
+                        if (data.input.status === 'RISING_EDGE') { // If the state is true
+                            button.classList.remove("btn-outline-success");
+                            button.classList.add("btn-success");
+                        } else {
+                            button.classList.remove("btn-success");
+                            button.classList.add("btn-outline-success");
+                        }
+                    }
+                }
+            )
+            ;
+            var allData = [];
+            document.getElementById('filter-input').addEventListener('input', filterData);
+            var autoScrollText2 = true;
+            socket.on('input_value', function (data) {
+                allData.push(data.data); // Store all incoming data
+                filterData();
+
+            });
+
+            document.getElementById('toggleAutoScroll2').addEventListener('click', function () {
+                autoScroll2 = !autoScroll2;
+                var span = document.getElementById('autoScrollText2');
+                if (autoScroll2) {
+                    // Change the text to show that auto-scroll is enabled
+                    span.textContent = 'Auto-Scroll On';
+                } else {
+                    // Change the text to show that auto-scroll is disabled
+                    span.textContent = 'Auto-Scroll Off';
+                }
+            });
+
+            function filterData() {
+                // Get the filter value
+                var filter = document.getElementById('filter-input').value.toLowerCase();
+
+                // Filter the entries
+                var filteredEntries = allData.filter(function (entry) {
+                    // The controller name is now the fourth part of the entry
+                    var controllerName = entry.data.split(',')[1].trim().toLowerCase();
+
+                    // Only include the entry if the controller name includes the filter
+                    return controllerName.includes(filter);
+                });
+
+                // Sort the filtered entries by timestamp
+                filteredEntries.sort(function (a, b) {
+                    // Compare the timestamps
+                    return a.timestamp - b.timestamp;
+                });
+
+                // Convert the filtered entries back to strings
+                var filteredStrings = filteredEntries.map(function (entry) {
+                    return entry.data;
+                });
+
+                // Update the textarea with the filtered entries
+                var textarea = document.getElementById('data-textarea');
+                textarea.value = filteredStrings.join('\n');
+
+                // Scroll to the bottom of the textarea
+                if (autoScroll2) {
+                    textarea.scrollTop = textarea.scrollHeight;
+                }
+            }
+
+            function formatDate(date) {
+            let day = String(date.getDate()).padStart(2, '0');
+            let month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based in JavaScript
+            let hours = String(date.getHours()).padStart(2, '0');
+            let minutes = String(date.getMinutes()).padStart(2, '0');
+            let seconds = String(date.getSeconds()).padStart(2, '0');
+
+            return `${day}/${month} ${hours}:${minutes}:${seconds}`;
+        }
+
+        function addInput(data) {
+            var controller = data.controller_name + ",";
+            var time_stamp = formatDate(new Date(data.timestamp)) + ","
+            var status = data.status + ",";
+            var addr = data.ip + ",";
+            var str_data =
+                time_stamp.padEnd(17) +
+                controller.padEnd(25) +
+                " Input: " +
+                status.padEnd(46)
+
+            ;
+            allData.push({timestamp: data.timestamp, data: str_data});
+            filterData();
+        }
+        }
+
+
+
+    </script>
+
+
+{% endblock %}

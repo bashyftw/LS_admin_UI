@@ -1,0 +1,40 @@
+
+{% include 'admin/include_css.html' %}
+
+<body class="app app-login p-0">
+
+<div class="row g-0 app-auth-wrapper">
+    <div class="col-12 auth-main-col text-center p-5">
+        <div class="app-auth-body mx-auto">
+
+            <div class="app-auth-branding mb-4">
+                <a class="app-logo" >
+                    <img class="logo-icon me-2"
+                         src="../../static/images/app-logo.svg"
+                         alt="logo">
+                </a>
+            </div>
+
+            <h2 class="auth-heading text-center mb-5">{{ title }}</h2>
+            <div class="auth-form-container text-start">
+                <form class="auth-form login-form" method="POST">
+                    {{ form.hidden_tag() }}
+                    <div class="user-name mb-3">
+                        {{ form.username(class="form-control", placeholder="Username", required=True) }}
+                    </div>
+                    <div class="password mb-3">
+                        {{ form.password(class="form-control", placeholder="Password", required=True) }}
+                    </div><!--//form-group-->
+                    <div class="text-center">
+                        {{ form.submit(class="btn app-btn-primary w-100 theme-btn mx-auto") }}
+                    </div>
+                </form>
+            {% include 'admin/alert.html' %}
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+
+{% include 'admin/include_js.html' %}
+

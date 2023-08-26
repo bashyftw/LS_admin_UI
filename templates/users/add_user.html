@@ -1,0 +1,63 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Add User{% endblock %}
+
+{% block content %}
+<div class="col-md-8 mx-auto">
+<h1 class="app-page-title">Add User</h1>
+
+    <div class="app-card app-card-settings shadow-sm p-4">
+
+        <div class="app-card-body">
+            <form method="POST">
+                {{ form.hidden_tag() }}
+                <div class="mb-3">
+                    {{ form.username.label(class="form-control-label form-label") }}
+                    {{ form.username(class="form-control") }}
+
+                </div>
+                <div class="mb-3">
+                    {{ form.password.label(class="form-control-label form-label") }}
+                    {{ form.password(class="form-control") }}
+                </div>
+                <div class="form-check form-switch mb-3">
+                    {{ form.is_enabled.label(class="form-check-label form-label") }}
+                    {{ form.is_enabled(class="form-check-input") }}
+                </div>
+                <div class="form-check form-switch mb-3">
+                    {{ form.is_admin.label(class="form-check-label form-label") }}
+                    {{ form.is_admin(class="form-check-input") }}
+                </div>
+                {{ form.submit(class="btn app-btn-primary") }}
+                 <a class="btn app-btn-secondary" href="{{ url_for('users') }}">Cancel</a>
+
+            </form>
+        </div><!--//app-card-body-->
+
+    </div><!--//app-card-->
+</div>
+
+
+
+<!--  <div class="container">-->
+<!--    <h1>Add User</h1>-->
+<!--    <form method="POST">-->
+<!--      {{ form.hidden_tag() }}-->
+<!--      <div class="form-group">-->
+<!--        {{ form.username.label(class="form-control-label") }}-->
+<!--        {{ form.username(class="form-control") }}-->
+<!--      </div>-->
+<!--      <div class="form-group">-->
+<!--        {{ form.password.label(class="form-control-label") }}-->
+<!--        {{ form.password(class="form-control") }}-->
+<!--      </div>-->
+<!--      <div class="form-group">-->
+<!--        {{ form.is_admin.label(class="form-check-label") }}-->
+<!--        {{ form.is_admin(class="form-check-input") }}-->
+<!--      </div>-->
+<!--      <div class="form-group">-->
+<!--        {{ form.submit(class="btn btn-primary") }}-->
+<!--      </div>-->
+<!--    </form>-->
+<!--  </div>-->
+{% endblock %}

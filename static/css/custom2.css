@@ -1,0 +1,1084 @@
+/*!
+ * Portal - Bootstrap 5 Admin Dashboard Template for Developers
+ * Version: 2.1
+ * Author: Xiaoying Riley
+ * Copyright: 3rd Wave Media Ltd.
+ * Website: http://themes.3rdwavemedia.com/
+ * Twitter: @3rdwave_themes
+*/
+body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.bi::before, [class^="bi-"]::before, [class*=" bi-"]::before {
+    vertical-align: 0em !important;  /* Replace 'baseline' with the value you want */
+}
+
+h1,.h1,h2,.h2,h3,.h3,h4,.h4,h5,.h5,h6,.h6 {
+    font-weight: 600
+}
+
+a {
+    text-decoration: none
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+.
+
+
+
+a.app-link {
+    text-decoration: underline;
+}
+
+
+button.close:focus {
+    outline: none;
+    box-shadow: none
+}
+
+.btn {
+    font-weight: 600;
+    padding: .5rem 1rem;
+    font-size: .875rem;
+    border: none
+}
+
+.btn:hover,.btn:active,.btn:focus {
+    text-decoration: none
+}
+
+.btn .bi {
+    position: relative;
+    top: -2px
+}
+
+.btn:focus,.btn.focus {
+    box-shadow: none !important
+}
+
+
+.dropdown-menu .dropdown-item {
+    padding: .5rem 1rem
+}
+
+
+.dropdown-divider {
+    -webkit-opacity: 1;
+    -moz-opacity: 1;
+    opacity: 1
+}
+
+.dropdown-toggle.no-toggle-arrow:after {
+    display: none !important
+}
+
+.app-header {
+    box-shadow: 0 1px 4px 0 rgba(0,0,0,.1);
+    height: 56px;
+}
+
+.app-header-inner {
+    position: relative
+}
+
+.app-search-form {
+    position: relative;
+    max-width: 600px
+}
+
+.app-search-form .search-input {
+    font-size: .875rem;
+    border-radius: .25rem;
+    padding-right: 3rem;
+    padding-left: 1rem
+}
+
+
+.app-search-form .search-btn {
+    border: none;
+    position: absolute;
+    right: 0;
+    top: 0;
+    margin-right: 0;
+    padding: .5rem 1rem
+}
+
+.app-utility-item {
+    display: inline-block;
+    margin-right: 1.25rem
+}
+
+.app-utility-item:last-child {
+    margin-right: 0
+}
+
+
+
+.app-utility-item .dropdown-toggle {
+    position: relative
+}
+
+.app-utility-item .dropdown-menu {
+    font-size: .875rem;
+    margin: 0
+}
+
+.app-utility-item .dropdown-menu.show {
+    top: 23px !important
+}
+
+.app-utility-item .icon {
+    font-size: 1.25rem;
+    width: 24px;
+    height: 24px
+}
+
+.app-utility-item .icon-badge {
+    display: inline-block;
+    border-radius: 50%;
+    position: absolute;
+    right: -0.45rem;
+    top: -0.3rem;
+    width: 20px;
+    height: 20px;
+    font-size: .6rem;
+    font-weight: bold;
+    padding-top: 1px;
+    text-align: center
+}
+
+
+.app-notifications-dropdown .dropdown-menu {
+    width: 300px
+}
+
+
+.app-notifications-dropdown .dropdown-menu .dropdown-menu-title {
+    font-size: 1rem
+}
+
+.app-notifications-dropdown .dropdown-menu .profile-image {
+    width: 36px;
+    height: 36px
+}
+
+.app-notifications-dropdown .dropdown-menu .info {
+    padding-right: 80px;
+    position: relative
+}
+
+.app-notifications-dropdown .dropdown-menu .meta {
+    position: absolute;
+    right: 0;
+    top: 0;
+    font-size: .75rem
+}
+
+.app-notifications-dropdown .dropdown-menu .item {
+    min-width: 250px;
+    position: relative;
+}
+
+.app-notifications-dropdown .dropdown-menu .item:last-child {
+    border-bottom: none
+}
+
+
+.app-notifications-dropdown .dropdown-menu .link-mask {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: block;
+    left: 0;
+    top: 0
+}
+
+.app-notifications-dropdown .app-icon-holder {
+    display: inline-block;
+    width: 36px;
+    height: 36px;
+    padding-top: 4px;
+    font-size: 1rem;
+    text-align: center;
+    border-radius: 50%
+}
+
+.app-notifications-dropdown .app-icon-holder svg {
+    width: 20px;
+    height: 20px
+}
+
+.app-user-dropdown {
+    display: inline-block
+}
+
+.app-user-dropdown img {
+    width: 36px;
+    height: 36px
+}
+
+@media(min-width: 576px) {
+    .app-notifications-dropdown .dropdown-menu {
+        width:400px
+    }
+}
+
+@media(min-width: 1200px) {
+    .app-header-inner {
+        margin-left:250px
+    }
+}
+
+@media(max-width: 575.98px) {
+    .search-mobile-trigger {
+        cursor:pointer;
+        -webkit-opacity: .8;
+        -moz-opacity: .8;
+        opacity: .8
+    }
+
+    .search-mobile-trigger:hover {
+        -webkit-opacity: 1;
+        -moz-opacity: 1;
+        opacity: 1
+    }
+
+    .app-search-box {
+        display: none;
+        position: absolute;
+        left: 0;
+        top: 56px;
+        padding: 0;
+        height: 100vh;
+        background: rgba(0,0,0,.5);
+        transition:none
+    }
+}
+
+@media(max-width: 575.98px)and (prefers-reduced-motion: reduce) {
+    .app-search-box {
+        transition:none
+    }
+}
+
+@media(max-width: 575.98px) {
+    .app-search-box .app-search-form .search-input {
+        border-radius:0;
+        padding-top: 1.5rem;
+        padding-bottom: 1.5rem
+    }
+
+    .app-search-box .app-search-form .search-btn {
+        top: 7px
+    }
+}
+
+@media(max-width: 575.98px) {
+    .app-search-box.is-visible {
+        display:block
+    }
+}
+
+.app-sidepanel {
+    position: fixed;
+    min-height: 100vh;
+    height: 100%;
+    left: 0;
+    top: 0;
+    font-size: .875rem;
+}
+
+.app-sidepanel .panel-drop {
+    display: none
+}
+
+.app-sidepanel .sidepanel-inner {
+    position: relative;
+    z-index: 10;
+    box-shadow: rgba(0,0,0,.05) 0px 8px 15px;
+    width: 250px;
+    height: 100%
+}
+
+.app-sidepanel .sidepanel-close {
+    display: none;
+    position: absolute;
+    z-index: 20;
+    right: -2rem;
+    top: 0;
+    font-size: 2rem
+}
+
+.app-sidepanel.sidepanel-hidden {
+    left: -400px
+}
+
+.app-sidepanel.sidepanel-visible {
+    left: 0
+}
+
+.app-sidepanel .app-nav-main {
+    overflow-y: auto;
+    scrollbar-width: thin
+}
+
+.app-sidepanel .app-nav-main::-webkit-scrollbar {
+    width: 6px;
+}
+
+.app-sidepanel .app-nav-main::-webkit-scrollbar-thumb {
+    border-radius: .5rem
+}
+
+.app-branding {
+    height: 60px;
+    padding-top: 1rem;
+    padding-left: 1rem;
+    margin-bottom: 1rem
+}
+
+.app-branding .logo-icon {
+    width: 36px;
+    height: 36px
+}
+
+.app-branding .logo-text {
+    font-size: 1.25rem;
+    font-weight: 600;
+    vertical-align: middle
+}
+
+.app-nav {
+    display: block;
+    padding: 0;
+    width: 100%
+}
+
+.app-nav .app-menu {
+    margin-bottom: 0
+}
+
+.app-nav .nav-item {
+    display: block;
+}
+
+.app-nav .nav-link {
+    display: block;
+    padding: .875rem 1rem;
+    position: relative;
+    display: block;
+    padding-left: 3rem;
+    border-left: 3px solid rgba(0,0,0,0)
+}
+
+.app-nav .nav-link.active {
+    font-weight: 500
+}
+
+.app-nav .nav-link.submenu-toggle.active {
+    background: none;
+}
+
+
+
+.app-nav .nav-icon {
+    position: absolute;
+    left: 1rem;
+    top: .7rem
+}
+
+.app-nav .nav-icon .bi {
+    width: 1.25rem;
+    height: 1.25rem
+}
+
+.app-nav .submenu-arrow {
+    position: absolute;
+    right: 1rem;
+    top: .7rem;
+}
+
+.app-nav .submenu-arrow svg {
+    width: 14px;
+    height: 14px
+}
+
+.app-nav .submenu-toggle {
+    transition:none
+}
+
+@media(prefers-reduced-motion: reduce) {
+    .app-nav .submenu-toggle {
+        transition: none
+    }
+}
+
+
+
+.app-nav .submenu-toggle[aria-expanded=true] .submenu-arrow svg {
+    -ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=2)";
+    transform: rotate(180deg);
+    -webkit-transform: rotate(180deg)
+}
+
+.app-nav .submenu-item {
+    margin-bottom: 0
+}
+
+.app-nav .submenu-link {
+    font-size: .875rem;
+    margin-left: 2rem;
+    padding: .5rem 1rem;
+    padding-left: 1rem;
+    position: relative;
+    display: block;
+    margin-bottom: 0
+}
+
+.app-nav .submenu-link:before {
+    content: " ";
+    display: inline-block;
+    height: inherit;
+    left: 0;
+    position: absolute;
+    width: 2px;
+    height: 100%;
+    margin-top: -0.5rem
+}
+
+
+
+
+.app-sidepanel-footer {
+    width: 100%;
+    bottom: 0;
+    left: 0;
+}
+
+.app-sidepanel-footer .app-nav-footer {
+    margin-bottom: 0
+}
+
+@media(max-width: 1199.98px) {
+    .app-sidepanel {
+        transition:none;
+        left: -400px
+    }
+}
+
+@media(max-width: 1199.98px)and (prefers-reduced-motion: reduce) {
+    .app-sidepanel {
+        transition:none
+    }
+}
+
+@media(max-width: 1199.98px) {
+    .app-sidepanel.sidepanel-visible {
+        display:block
+    }
+}
+
+@media(max-width: 1199.98px) {
+    .sidepanel-visible .sidepanel-close {
+        display:inline-block
+    }
+}
+
+@media(max-width: 1199.98px) {
+    .sidepanel-visible .sidepanel-drop {
+        position:fixed;
+        display: block;
+        min-height: 100vh;
+        height: 100%;
+        width: 100%;
+        min-width: 100vw;
+        left: 0;
+        top: 0;
+        background: rgba(0,0,0,.35)
+    }
+}
+
+@media(min-width: 1200px) {
+    .app-wrapper {
+        margin-left:250px
+    }
+}
+
+.app {
+    min-height: 100vh;
+    height: 100%;
+    width: 100%;
+    padding-top: 56px;
+    overflow-x: hidden
+}
+
+.app-footer .copyright {
+    font-size: .8125rem
+}
+
+.app-wrapper {
+    transition:none
+}
+
+@media(prefers-reduced-motion: reduce) {
+    .app-wrapper {
+        transition: none
+    }
+}
+
+.app-page-title {
+    font-size: 1.5rem;
+    font-weight: bolder;
+    margin-bottom: 1.5rem
+}
+
+.app-card {
+    position: relative;
+    border-radius: .25rem
+}
+
+
+.app-card .app-card-link-mask {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: block;
+    left: 0;
+    top: 0
+}
+
+
+
+.app-card .app-card-title {
+    font-size: 1.125rem;
+    margin-bottom: 0
+}
+
+.app-card .card-header-action {
+    font-size: .875rem
+}
+
+.app-card .card-header-action a:hover {
+    text-decoration: underline
+}
+
+.app-card .form-select-holder {
+    display: inline-block
+}
+
+.app-card .btn-close {
+    padding: 1rem
+}
+
+.app-card .btn-close:focus {
+    box-shadow: none
+}
+
+.app-card-stat {
+    text-align: center
+}
+
+.app-card-stat .stats-type {
+    font-size: .875rem;
+    text-transform: uppercase
+}
+
+.app-card-stat .stats-figure {
+    font-size: 2rem;
+}
+
+.app-card-stat .stats-meta {
+    font-size: .875rem;
+}
+
+.app-card-progress-list .item {
+    position: relative;
+}
+
+
+.app-card-progress-list .item:last-child {
+    border: none
+}
+
+.app-card-progress-list .item .title {
+    font-size: .875rem;
+    font-weight: 500
+}
+
+.app-card-progress-list .item .meta {
+    font-size: .875rem;
+}
+
+.app-card-progress-list .item-link-mask {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: block;
+    left: 0;
+    top: 0
+}
+
+.app-card-progress-list .progress {
+    height: .5rem
+}
+
+.app-card-stats-table .table {
+    font-size: .875rem
+}
+
+.app-card-stats-table .meta {
+    font-weight: 500;
+    font-size: .875rem
+}
+
+.app-card-stats-table .stat-cell {
+    text-align: right
+}
+
+.app-card-basic {
+    height: 100%
+}
+
+.app-card-basic .title {
+    font-size: 1rem
+}
+
+.app-card .app-icon-holder {
+    display: inline-block;
+    width: 50px;
+    height: 50px;
+    padding-top: 10px;
+    font-size: 1rem;
+    text-align: center;
+    border-radius: 50%
+}
+
+
+.app-card .app-icon-holder svg {
+    width: 24px;
+    height: 24px
+}
+
+.app-card .app-card-body.has-card-actions {
+    position: relative;
+    padding-right: 1rem !important
+}
+
+.app-card .app-card-body .app-card-actions {
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    text-align: center;
+    border-radius: 50%;
+    position: absolute;
+    z-index: 10;
+    right: .75rem;
+    top: .75rem
+}
+
+
+.app-card .app-card-body .app-card-actions .dropdown-menu {
+    font-size: .8125rem
+}
+
+.app-card-doc:hover {
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important
+}
+
+.app-card-doc .app-card-thumb-holder {
+    text-align: center;
+    position: relative;
+    height: 112px
+}
+
+.app-card-doc .app-card-thumb-holder .app-card-thumb {
+    overflow: hidden;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.app-card-doc .app-card-thumb-holder .thumb-image {
+    -webkit-opacity: .7;
+    -moz-opacity: .7;
+    opacity: .7;
+    width: 100%;
+    height: auto
+}
+
+
+.app-card-doc .app-card-thumb-holder:hover .thumb-image {
+    -webkit-opacity: 1;
+    -moz-opacity: 1;
+    opacity: 1
+}
+
+.app-card-doc .app-card-thumb-holder .badge {
+    position: absolute;
+    right: .5rem;
+    top: .5rem
+}
+
+.app-card-doc .app-card-thumb-holder .icon-holder {
+    font-size: 40px;
+    display: inline-block;
+    margin: 0 auto;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    padding-top: 10px
+}
+
+
+
+.app-card-doc .app-doc-title {
+    font-size: .875rem
+}
+
+.app-card-doc .app-doc-title.truncate {
+    max-width: calc(100% - 30px);
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap
+}
+
+.app-card-doc .app-doc-meta {
+    font-size: .75rem
+}
+
+.table-search-form .form-control {
+    height: 2rem;
+    min-width: auto
+}
+
+.app-dropdown-menu {
+    font-size: .875rem
+}
+
+.app-card-orders-table .table {
+    font-size: .875rem
+}
+
+.app-card-orders-table .table .cell {
+    vertical-align: middle
+}
+
+.app-card-orders-table .cell span {
+    display: inline-block
+}
+
+.app-card-orders-table .cell .note {
+    display: block;
+    font-size: .75rem
+}
+
+.app-card-orders-table .btn-sm,.app-card-orders-table .btn-group-sm>.btn {
+    padding: .125rem .5rem;
+    font-size: .75rem
+}
+
+.app-card-orders-table .truncate {
+    max-width: 250px;
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap
+}
+
+.app-nav-tabs {
+    padding: 0
+}
+
+.app-nav-tabs .nav-link {
+    font-size: .875rem;
+    font-weight: bold
+}
+
+
+.app-nav-tabs .nav-link.active:hover {
+    background: none
+}
+
+
+.app-pagination .pagination {
+    font-size: .875rem
+}
+
+.app-pagination .pagination .page-link {
+
+    padding: .25rem .5rem
+}
+
+
+
+.app-card-accordion .app-card-title {
+    font-size: 1.125rem
+}
+
+.app-card-accordion .faq-accordion .accordion-item {
+    border-radius: 0;
+    border: none;
+}
+
+.app-card-accordion .faq-accordion .accordion-item:last-child {
+    border-bottom: none
+}
+
+.app-card-accordion .faq-accordion .accordion-header {
+    border: none
+}
+
+.app-card-accordion .faq-accordion .accordion-button {
+    padding: 1rem;
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
+    background: none;
+    padding-left: 0;
+    font-size: 1rem;
+    text-decoration: none;
+}
+
+.app-card-accordion .faq-accordion .accordion-button:after {
+    display: none
+}
+
+.app-card-accordion .faq-accordion .accordion-body {
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: 0;
+    font-size: 1rem
+}
+
+.app-card-account {
+    height: 100%
+}
+
+.app-card-account .item {
+    font-size: .875rem
+}
+
+.app-card-account .item .profile-image {
+    width: 60px;
+    height: 60px
+}
+
+.app-card-account .item .btn-sm,.app-card-account .item .btn-group-sm>.btn {
+    padding: .125rem .5rem;
+    font-size: .75rem
+}
+
+.settings-section .section-title {
+    font-size: 1.25rem
+}
+
+.settings-section .section-intro {
+    font-size: .875rem
+}
+
+.app-card-settings {
+    font-size: 1rem
+}
+
+.app-card-settings .form-label {
+    font-weight: bold
+}
+
+.app-card-settings .form-control {
+    font-size: 1rem
+}
+
+.app-404-page {
+    padding-top: 2rem
+}
+
+.app-404-page .page-title {
+    font-size: 3rem;
+    line-height: .8;
+    font-weight: bold
+}
+
+.app-404-page .page-title span {
+    font-size: 1.5rem
+}
+
+.chart-container {
+    position: relative
+}
+
+
+.app-card-notification .notification-type .badge {
+    font-size: .65rem;
+    text-transform: uppercase
+}
+
+.app-card-notification .profile-image {
+    width: 60px;
+    height: 60px
+}
+
+.app-card-notification .notification-title {
+    font-size: 1.125rem
+}
+
+.app-card-notification .notification-content {
+    font-size: .875rem
+}
+
+.app-card-notification .notification-meta {
+    font-size: .75rem;
+}
+
+.app-card-notification .action-link {
+    font-size: .875rem
+}
+
+@media(min-width: 1200px) {
+    .table-search-form .form-control {
+        min-width:300px
+    }
+}
+
+@media(max-width: 575.98px) {
+    .app-card-stat .stats-figure {
+        font-size:1.125rem
+    }
+
+    .app-card-stat .stats-type {
+        font-size: .75rem
+    }
+}
+
+.app-login .auth-background-holder {
+    background-size: cover;
+    height: 100vh;
+    min-height: 100%
+}
+
+.app-signup .auth-background-holder {
+    background-size: cover;
+    height: 100vh;
+    min-height: 100%
+}
+
+.app-reset-password .auth-background-holder {
+    background-size: cover;
+    height: 100vh;
+    min-height: 100%
+}
+
+.auth-main-col,.auth-background-col {
+    position: relative
+}
+
+.auth-background-mask {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    z-index: 10;
+    background: rgba(0,0,0,.1)
+}
+
+.auth-background-overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    z-index: 11
+}
+
+.auth-background-overlay .overlay-title {
+    font-size: 1rem;
+    font-weight: bold
+}
+
+.auth-background-overlay .overlay-content {
+    background: rgba(37,41,48,.6);
+}
+
+.auth-background-overlay .overlay-content a {
+    text-decoration: underline;
+}
+
+.app-auth-footer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%
+}
+
+.app-auth-wrapper {
+    height: 100vh
+}
+
+.app-auth-wrapper .app-auth-body {
+    width: 360px
+}
+
+.app-auth-wrapper .app-logo .logo-icon {
+    width: 60px;
+    height: 60px
+}
+
+.app-auth-wrapper .auth-heading {
+    font-size: 1.5rem
+}
+
+
+.app-auth-wrapper .legal-note {
+    font-size: .875rem
+}
+
+.app-auth-wrapper .extra {
+    font-size: .75rem
+}
+
+.app-auth-wrapper .extra a {
+    text-decoration: underline;
+}
+
+.app-auth-wrapper .auth-heading-desc {
+    font-weight: 500;
+    font-size: 1.125rem
+}
+
+.app-auth-wrapper .legal-note {
+    font-size: .75rem
+}
+
+.app-auth-wrapper .auth-option {
+    font-size: .875rem
+}
+
+.app-auth-footer .copyright {
+    font-size: .75rem
+}
+
+@media(max-width: 767.98px) {
+    .auth-background-col {
+        display:none
+    }
+
+    .app-auth-wrapper .app-auth-body {
+        width: 100%
+    }
+}

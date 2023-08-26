@@ -1,0 +1,143 @@
+{% extends 'admin/base.html' %}
+{% block content %}
+    <script src="https://unpkg.com/vis@4.21.0/dist/vis.min.js"></script>
+    <link href="https://unpkg.com/vis@4.21.0/dist/vis.min.css" rel="stylesheet" type="text/css"/>
+    <script src="../../static/js/socket.io.js"></script>
+    <div class="row g-3 mb-4 align-items-center justify-content-between">
+        <div class="col-auto">
+            <h1 class="app-page-title mb-0">Overview</h1>
+        </div>
+
+
+    </div><!--//row-->
+
+
+
+    <div class="tab-content" id="orders-table-tab-content">
+        <div class="tab-pane fade show active" id="orders-all" role="tabpanel" aria-labelledby="orders-all-tab">
+            <div class="app-card app-card-orders-table shadow-sm mb-5">
+                <div class="app-card-body">
+
+
+                    <div id="visualization"></div>
+                    <button id="toggleAutoScroll">Toggle Auto Scroll</button>
+
+                </div><!--//row-->
+            </div><!--//row-->
+        </div><!--//row-->
+    </div><!--//row-->
+
+    <script>
+
+        window.onload = function () {
+            var autoScroll = true;
+
+            document.getElementById('toggleAutoScroll').addEventListener('click', function () {
+                autoScroll = !autoScroll;
+            });
+            // DOM element where the Timeline will be attached
+            var container = document.getElementById('visualization');
+            // Create a DataSet (allows two way data-binding)
+            var groups = new vis.DataSet([
+                {id: 1, content: 'Speaker 1'},
+                {id: 2, content: 'Speaker 2'},
+                {id: 3, content: 'Speaker 3'},
+                {id: 4, content: 'Speaker 4'},
+            ]);
+            var items = new vis.DataSet([]);
+
+            // Configuration for the Timeline
+            var options = {
+                start: new Date(Date.now() - 1000 * 60 * 1.5),  // One hour ago
+                end: new Date(Date.now() + 1000 * 60 * 1.5),  // One hour from now
+                format: {
+                    minorLabels: {
+                        millisecond: 'x',
+                        second: 's',
+                        minute: 'HH:mm:ss',
+                        hour: 'HH:mm:ss',
+                        weekday: 'HH:mm:ss',
+                        day: 'HH:mm:ss',
+                        month: 'HH:mm:ss',
+                        year: 'HH:mm:ss'
+                    }
+                }
+            };
+
+            // Create a Timeline
+            var timeline = new vis.Timeline(container, items, groups, options);
+
+            // Update the timeline every second to keep the current time in the center
+            setInterval(function () {
+                var currentTime = new Date();
+
+                // Update the content of each item to show the progress
+                items.forEach(function (item) {
+                    if (item.removed) {
+                        return;
+                    }
+                    var progress = ((currentTime - item.start) / (item.end - item.start)) * 100;
+                    progress = Math.min(Math.max(Math.round(progress), 0), 100);  // Limit progress to 100%
+                    item.content = item.file_name + ' ' + progress + '%';
+                    items.update(item);
+                });
+
+                if (autoScroll) {
+                    timeline.moveTo(currentTime, {animation: {duration: 1000, easingFunction: 'linear'}});
+                }
+            }, 1000);
+
+
+            var socket = io();
+            socket.on('connect', function () {
+                socket.emit('input_history');
+            });
+
+            socket.on('audio data', function (data) {
+
+                if (data.removed) {
+                    // Find the item with the same start time and file name
+                    var itemsToUpdate = items.get({
+                        filter: function (item) {
+                            return item.start.getTime() === data.start_time * 1000 && item.file_name === data.audio_file;
+                        }
+                    });
+
+                    // Update the items
+                    itemsToUpdate.forEach(function (item) {
+                        item.removed = true;
+                        item.style = 'background-color: red';  // Change color to red
+                        var currentTime = new Date();
+                        var progress = ((currentTime - item.start) / (item.end - item.start)) * 100;
+                        progress = Math.min(Math.max(Math.round(progress), 0), 100);  // Limit progress to 100%
+                        item.content = item.file_name + ' ' + progress + '%';
+                        items.update(item);
+                    });
+                } else {
+                    // Convert the start time to a Date object
+                    var startTime = new Date(data.start_time * 1000);
+
+                    // Calculate the end time
+                    var endTime = new Date((data.start_time + data.duration) * 1000);
+
+                    // Create a new item for each speaker
+                    data.speakers.forEach(function (speaker, index) {
+                        var item = {
+                            id: Date.now() + index,  // Generate a unique ID for each item
+                            group: speaker,
+                            file_name: data.audio_file,
+                            start: startTime,
+                            end: endTime
+                        };
+                        var currentTime = new Date();
+                        var progress = ((currentTime - item.start) / (item.end - item.start)) * 100;
+                        progress = Math.min(Math.max(Math.round(progress), 0), 100);  // Limit progress to 100%
+                        item.content = item.file_name + ' ' + progress + '%';
+                        items.add(item);
+                    });
+                }
+            });
+        }
+    </script>
+
+{% endblock %}

@@ -1,0 +1,23 @@
+
+{% include 'admin/include_css.html' %}
+
+<body class="app app-404-page">
+
+<div class="container mb-5">
+    <div class="row">
+        <div class="col-12 col-md-11 col-lg-7 col-xl-6 mx-auto">
+            <div class="app-card p-5 text-center shadow-sm">
+                <h1 class="page-title mb-4">404<br></h1>
+                <div class="mb-4">
+                    Page Not Found<br>
+                    Sorry, we can't find the page you're looking for.
+                </div>
+                <a class="btn app-btn-primary" href="{{ url_for('index') }}">Go to Overview</a>
+            </div>
+        </div><!--//col-->
+    </div><!--//row-->
+</div><!--//container-->
+
+
+
+</body>

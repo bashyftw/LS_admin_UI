@@ -1,0 +1,76 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+<h1 class="app-page-title">Edit Account</h1>
+<div class="row gy-4 ">
+    <div class="col-12 col-lg-6 ">
+
+
+        <div class="app-card app-card-settings shadow-sm p-4">
+            <div class="app-card-body">
+                <form method="POST">
+                    {{ editUserForm.hidden_tag() }}
+                    <div class="mb-3">
+                        {{ editUserForm.username.label(class="form-control-label form-label") }}
+                        {{ editUserForm.username(class="form-control") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ editUserForm.avatar.label(class="form-control-label form-label ") }}
+                        {{ editUserForm.avatar(class="form-select", id="avatarDropdown") }}
+                        <br>
+                        <img src="" height="120"
+                             id="avatarImage">
+                    </div>
+                    {% if current_user.is_admin %}
+                    <div class="form-check form-switch mb-3">
+                        {{ editUserForm.is_enabled.label(class="form-check-label form-label") }}
+                        {{ editUserForm.is_enabled(class="form-check-input") }}
+                    </div>
+                    <div class="form-check form-switch mb-3">
+                        {{ editUserForm.is_admin.label(class="form-check-label form-label") }}
+                        {{ editUserForm.is_admin(class="form-check-input") }}
+                    </div>
+                    {% endif %}
+                    {{ editUserForm.submitEdit(class="btn app-btn-primary") }}
+                </form>
+            </div><!--//app-card-body-->
+
+        </div><!--//app-card-->
+    </div>
+    <div class="col-12 col-lg-6">
+        <div class="app-card app-card-settings shadow-sm p-4">
+            <div class="app-card-body">
+                <form method="POST">
+                    {{ editPassForm.hidden_tag() }}
+                    <div class="mb-3">
+                        {{ editPassForm.oldPassword.label(class="form-control-label form-label") }}
+                        {{ editPassForm.oldPassword(class="form-control") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ editPassForm.newPassword.label(class="form-control-label form-label") }}
+                        {{ editPassForm.newPassword(class="form-control") }}
+                    </div>
+                    {{ editPassForm.submitPass(class="btn app-btn-primary") }}
+                </form>
+            </div><!--//app-card-body-->
+
+        </div><!--//app-card-->
+    </div>
+</div>
+
+<script>
+    var avatarDropdown = document.getElementById('avatarDropdown');
+
+    // Function to handle changescan ui
+    function handleAvatarChange() {
+
+        var avatarImage = document.getElementById('avatarImage');
+        avatarImage.src = '../static/images/avatar/' + avatarDropdown.selectedIndex + '.png';
+    }
+
+    handleAvatarChange()
+    // Update the value whenever the user selects a different option
+    avatarDropdown.addEventListener('change', handleAvatarChange);
+</script>
+
+{% endblock %}

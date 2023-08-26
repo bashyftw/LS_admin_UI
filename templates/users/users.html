@@ -1,0 +1,113 @@
+{% extends "admin/base.html" %}
+
+
+
+{% block content %}
+
+
+<div class="row g-3 mb-4 align-items-center justify-content-between">
+    <div class="col-auto">
+        <h1 class="app-page-title mb-0">Users</h1>
+    </div>
+    {% if current_user.is_admin %}
+    <div class="col-auto">
+        <a class="btn app-btn-secondary" href="{{ url_for('add_user') }}">
+            <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-file-person me-1"
+                 fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd"
+                      d="M12 1H4a1 1 0 0 0-1 1v10.755S4 11 8 11s5 1.755 5 1.755V2a1 1 0 0 0-1-1zM4 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H4z"/>
+                <path fill-rule="evenodd" d="M8 10a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+            </svg>
+            Add User
+        </a>
+    </div>
+    {% endif %}
+
+</div><!--//row-->
+
+
+<div class="tab-content" id="orders-table-tab-content">
+    <div class="tab-pane fade show active" id="orders-all" role="tabpanel" aria-labelledby="orders-all-tab">
+        <div class="app-card app-card-orders-table shadow-sm mb-5">
+            <div class="app-card-body">
+                <div class="table-responsive">
+                    <table class="table app-table-hover mb-0 text-left">
+                        <thead>
+                        <tr>
+                            <th>Avatar</th>
+                            <th>Username</th>
+                            <th>Admin</th>
+                            <th>Enabled</th>
+                            {% if current_user.is_admin %}
+                            <th  width="25%">Actions</th>
+                            {% endif %}
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td>&nbsp;<img src="../static/images/avatar/{{ user.avatar }}.png" height="30"
+                             id="avatarImage"></td>
+                            <td>{{ user.username }}</td>
+                            <td>{{ user.is_admin }}</td>
+                            <td>{{ user.is_enabled }}</td>
+                            {% if current_user.is_admin %}
+                            <td>
+                                <a href="{{ url_for('edit_user', user_id=user.id) }}" class="btn-sm app-btn-secondary">Edit</a>
+
+                                {% set modal_id = 'deleteModal' + user.id|string %}
+                                {% set title = 'Confirm Delete' %}
+                                {% set message = 'Are you sure you want to delete this user?' %}
+                                {% set action_url = url_for('delete_user', user_id=user.id) %}
+                                {% include 'admin/confirm_modal.html' %}
+                                <a class="btn-sm app-btn-secondary" data-bs-toggle="modal" href="#{{ modal_id }}"
+                                   role="button">Delete</a>
+
+                            </td>
+                        </tr>
+                        {% endif %}
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div><!--//table-responsive-->
+
+            </div><!--//app-card-body-->
+        </div><!--//app-card-->
+
+        <nav class="app-pagination">
+            <ul class="pagination justify-content-center">
+                {% if users.has_prev %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('users', page=users.prev_num) }}">Previous</a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+                </li>
+                {% endif %}
+                {% for page_num in users.iter_pages() %}
+                {% if page_num != page %}
+                <li class="page-item"><a class="page-link" href="{{ url_for('users', page=page_num) }}">{{ page_num
+                    }}</a></li>
+                {% else %}
+                <li class="page-item active"><a class="page-link" href="{{ url_for('users', page=page_num) }}">{{
+                    page_num }}</a></li>
+                {% endif %}
+                {% endfor %}
+                {% if users.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('users', page=users.next_num) }}">Next</a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Next</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav><!--//app-pagination-->
+
+    </div><!--//tab-pane-->
+</div><!--//tab-content-->
+
+
+{% endblock %}

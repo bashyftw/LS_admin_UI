@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>{{ title }}</title>
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
+
+    {% include 'admin/include_css.html' %}
+
+
+</head>
+
+<header class="app-header fixed-top">
+    {% include 'admin/header.html' %}
+    {% include 'admin/nav.html' %}
+</header>
+<body class="app">
+<div class="app-wrapper">
+    <div class="app-content pt-3 p-md-3 p-lg-4">
+
+        {% include 'admin/alert.html' %}
+        {% block content %}
+        {% endblock %}
+
+
+
+    </div><!--//container-fluid-->
+</div><!--//app-content-->
+
+
+{% include 'admin/include_js.html' %}
+
+
+
+</body>
+</html>

@@ -1,0 +1,280 @@
+{% extends "admin/base.html" %}
+
+
+{% include 'admin/display_modal.html' %}
+{% block content %}
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment"></script>
+
+    <div class="row g-3 mb-4 align-items-center justify-content-between">
+        <div class="col-auto">
+            <h1 class="app-page-title mb-0">{{ controller.controller_name }}</h1>
+        </div>
+        <div class="col-auto">
+            <a id="refresh-button" class="btn app-btn-secondary" href="#">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                     class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
+                    <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+                </svg>
+                Refresh
+            </a>
+            <a class="btn app-btn-secondary" href="{{ url_for('reboot_controller', controller_id=controller.id) }}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                     class="bi bi-bootstrap-reboot me-1" viewBox="0 0 16 16">
+                    <path d="M1.161 8a6.84 6.84 0 1 0 6.842-6.84.58.58 0 1 1 0-1.16 8 8 0 1 1-6.556 3.412l-.663-.577a.58.58 0 0 1 .227-.997l2.52-.69a.58.58 0 0 1 .728.633l-.332 2.592a.58.58 0 0 1-.956.364l-.643-.56A6.812 6.812 0 0 0 1.16 8z"/>
+                    <path d="M6.641 11.671V8.843h1.57l1.498 2.828h1.314L9.377 8.665c.897-.3 1.427-1.106 1.427-2.1 0-1.37-.943-2.246-2.456-2.246H5.5v7.352h1.141zm0-3.75V5.277h1.57c.881 0 1.416.499 1.416 1.32 0 .84-.504 1.324-1.386 1.324h-1.6z"/>
+                </svg>
+                Reboot
+            </a>
+        </div>
+
+    </div><!--//row-->
+
+    <div class="row gy-4 ">
+        <div class="col-12 col-lg-6 ">
+
+
+            <div class="app-card app-card-settings shadow-sm p-4">
+                <div class="app-card-body">
+                    <div class="item border-bottom py-3">
+                        <div class="row justify-content-between align-items-center">
+                            <div class="col-auto">
+                                <div class="item-label"><strong>Status</strong></div>
+                                <div class="item-data">
+                                    <div class="status">
+                                        <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                        <span class="status-text"></span>  <!-- Add this line -->
+                                    </div>
+                                </div>
+                            </div><!--//col-->
+                        </div><!--//row-->
+                    </div>
+                    <div class="item border-bottom py-3">
+                        <div class="row justify-content-between align-items-center">
+                            <div class="col-auto">
+                                <div class="item-label"><strong>Name</strong></div>
+                                <div class="item-data">{{ controller.controller_name }}</div>
+                            </div><!--//col-->
+                            <div class="col text-end">
+                                <a href="{{ url_for('edit_controller', controller_id=controller.id) }}"
+                                   class="btn-sm app-btn-secondary">Edit</a>
+                            </div><!--//col-->
+                        </div><!--//row-->
+                    </div>
+                    <div class="item border-bottom py-3">
+                        <div class="row justify-content-between align-items-center">
+                            <div class="col-auto">
+                                <div class="item-label"><strong>IP address</strong></div>
+                                <div class="item-data">{{ controller.address }}</div>
+                            </div><!--//col-->
+                            <div class="col text-end">
+                                {#                                <a class="btn-sm app-btn-secondary" href="#">Change</a>#}
+                            </div><!--//col-->
+                        </div><!--//row-->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-6">
+            <div class="app-card app-card-settings shadow-sm p-4 ">
+                <div class="app-card-body">
+                    <canvas id="myChart"></canvas>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+    <br>
+    <div class="tab-content" id="orders-table-tab-content">
+        <div class="tab-pane fade show active" id="orders-all" role="tabpanel" aria-labelledby="orders-all-tab">
+            <div class="app-card app-card-orders-table shadow-sm mb-5">
+                <div class="app-card-body">
+                    <div class="table-responsive">
+                        <table class="table app-table-hover mb-0 text-left">
+                            <thead>
+                            <tr>
+                                <th>Service</th>
+                                <th>Status</th>
+                                <th>Enabled</th>
+                                <th width="25%">Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody id="services-table">
+                            </tbody>
+                        </table>
+                    </div><!--//table-responsive-->
+
+                </div><!--//app-card-body-->
+            </div><!--//app-card-->
+
+
+        </div><!--//tab-pane-->
+    </div><!--//tab-content-->
+
+
+
+
+    <script>
+
+        var controllerId = {{ controller.id|tojson|safe }};
+        var controllerStatus = false;
+
+        window.onload = function () {
+
+            get_status();
+
+            document.getElementById('refresh-button').addEventListener('click', function (event) {
+                var statusDiv = document.querySelector('.status');
+                var spinner = statusDiv.querySelector('.spinner-border');
+                var statusText = statusDiv.querySelector('.status-text');
+                spinner.style.display = 'inline-block';
+                statusText.style.display = 'none';
+                get_status();
+            });
+
+            function display_message(header, body) {
+                var modal = document.getElementById('displayModal');
+
+                // Get references to the elements inside the modal that you want to update
+                var modalTitle = modal.querySelector('.modal-title');
+                var modalBody = modal.querySelector('.modal-body');
+
+                // Update the content of the modal
+                modalTitle.textContent = header;
+                modalBody.textContent = body;
+
+                // Show the modal
+                var bootstrapModal = new bootstrap.Modal(modal);
+                bootstrapModal.show();
+            }
+
+
+            function get_status() {
+                fetch('/controller_status/' + controllerId)
+                    .then(response => response.json())
+                    .then(data => {
+                        var statusDiv = document.querySelector('.status');
+                        var spinner = statusDiv.querySelector('.spinner-border');
+                        var statusText = statusDiv.querySelector('.status-text');  // Select the status text
+                        spinner.style.display = 'none';
+                        statusText.style.display = 'inline';  // Show the status text
+                        statusText.textContent = data.status;
+                        if (data.status != 'Offline') {
+                            controllerStatus = true;
+                            get_services()
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+
+
+            function getButtonsForService(service, controllerId) {
+                var buttons = []; // Logs button is always present
+                var urls = {}; // Store the URLs for each action
+
+                if (service.status === 'Active') {
+                    buttons.push('Stop', 'Restart');
+                    urls['Stop'] = '/service_operation/' + controllerId + '/' + service.name + '/stop';
+                    urls['Restart'] = '/service_operation/' + controllerId + '/' + service.name + '/restart';
+                } else {
+                    buttons.push('Start');
+                    urls['Start'] = '/service_operation/' + controllerId + '/' + service.name + '/start';
+                }
+
+                if (service.enabled) {
+                    buttons.push('Disable');
+                    urls['Disable'] = '/service_operation/' + controllerId + '/' + service.name + '/disable';
+                } else {
+                    buttons.push('Enable');
+                    urls['Enable'] = '/service_operation/' + controllerId + '/' + service.name + '/enable';
+                }
+                buttons.push('Logs');
+                urls['Logs'] = '/logs/' + service.name;
+
+                return {buttons: buttons, urls: urls};
+            }
+
+            function get_services() {
+
+                fetch('/get_services/' + controllerId)
+                    .then(response => response.json())
+                    .then(data => {
+                        // Get a reference to the table body
+                        var tableBody = document.getElementById('services-table');
+
+                        // Clear the table body
+                        tableBody.innerHTML = '';
+
+                        // Add a new row for each service
+                        data.services.forEach(service => {
+                            var row = document.createElement('tr');
+                            var nameCell = document.createElement('td');
+                            var statusCell = document.createElement('td');
+                            var enabledCell = document.createElement('td');
+                            var actionsCell = document.createElement('td');
+
+                            nameCell.textContent = service.name;
+                            statusCell.textContent = service.status;
+                            enabledCell.textContent = service.enabled ? 'Yes' : 'No';
+
+                            var buttonsAndUrls = getButtonsForService(service, controllerId);
+
+                            buttonsAndUrls.buttons.forEach(action => {
+                                var button = document.createElement('a');
+                                button.href = '#';
+                                button.className = 'btn-sm app-btn-secondary';
+                                button.textContent = action;
+                                button.addEventListener('click', function () {
+                                    fetch(buttonsAndUrls.urls[action])
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            var message = "Status: " + data.status + ", Enabled: " + data.enabled
+                                            get_services();
+                                            display_message(data.name, message)
+                                            // Handle the response here
+                                            console.log(data);
+                                        })
+                                        .catch(error => {
+                                            // Handle any errors here
+                                            console.error('Error:', error);
+                                        });
+                                });
+                                actionsCell.appendChild(button);
+                            });
+
+                            row.appendChild(nameCell);
+                            row.appendChild(statusCell);
+                            row.appendChild(enabledCell);
+                            row.appendChild(actionsCell);
+
+                            tableBody.appendChild(row);
+                        });
+                    })
+                    .catch(error => {
+                        // Handle any errors here
+                        console.error('Error:', error);
+                    });
+            }
+
+
+        }
+
+    </script>
+
+    <script src="../../static/js/controller_details_charts.js"></script>
+
+
+
+{% endblock %}
