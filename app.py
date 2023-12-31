@@ -1,5 +1,4 @@
 from flask import Flask
-from flask_bootstrap import Bootstrap5
 from flask_socketio import SocketIO
 from flask_sqlalchemy import SQLAlchemy
 import os

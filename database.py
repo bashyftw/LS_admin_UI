@@ -4,9 +4,6 @@ from datetime import datetime, timedelta
 from app import db
 
 
-
-
-
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     avatar = db.Column(db.Integer, default=1)
@@ -25,6 +22,7 @@ class Controller(UserMixin, db.Model):
 def round_to_second():
     dt = datetime.utcnow()
     return dt - timedelta(microseconds=dt.microsecond)
+
 
 class Log(db.Model):
     id = db.Column(db.Integer, primary_key=True)

@@ -54,6 +54,40 @@ def add_controller():
     return render_template('controllers/add_controller.html', form=form, form_title = "Add Controller")
 
 
+from flask import jsonify, request, flash
+from app import app, db
+from database import Controller
+from flask_login import login_required
+from sqlalchemy.exc import IntegrityError
+
+
+@app.route('/api/add_controller', methods=['POST'])
+@login_required
+def add_controller_api():
+    """Add a new controller.
+
+    Returns:
+        JSON: Status of the operation.
+    """
+    data = request.get_json()
+    if not data or 'address' not in data or 'controller_name' not in data:
+        return jsonify({"status": "error", "message": "Invalid input"}), 400
+
+    controller = Controller()
+    controller.controller_name = data['controller_name']
+    controller.address = data['address']
+    db.session.add(controller)
+
+    try:
+        db.session.commit()
+        log_event('Controller added: ' + controller.controller_name)
+        return jsonify({"status": "success", "message": f"Controller added: {controller.controller_name}"})
+    except IntegrityError as e:
+        print(e)
+        db.session.rollback()
+        return jsonify({"status": "error", "message": "Controller address already exists"}), 400
+
+
 @app.route('/edit_controller/<int:controller_id>', methods=['GET', 'POST'])
 @login_required
 def edit_controller(controller_id):
@@ -185,7 +219,7 @@ def get_cpu(controller_id):
 def details_controller(controller_id):
     controller = Controller.query.get(controller_id)
     if not controller:
-        flash('Controller not found ' , 'error')
+        flash('Controller not found ', 'error')
         return redirect(url_for('controllers'))
     # services = get_services(controller)
 

@@ -2,7 +2,7 @@ from threading import Thread
 from app import app, db
 from flask import Flask, render_template, redirect, url_for
 from database import User, Controller
-
+from werkzeug.security import generate_password_hash
 
 from routes.users import *
 from routes.login import *
@@ -61,7 +61,7 @@ if __name__ == '__main__':
     with app.app_context():
         db.create_all()
         if not User.query.filter_by(username='admin').first():
-            user = User(username='admin', password=generate_password_hash('admin', method='sha256'), is_admin = True)
+            user = User(username='admin', password=generate_password_hash('admin', method='pbkdf2:sha256'), is_admin=True)
             db.session.add(user)
             db.session.commit()
             # Create some dummy data
