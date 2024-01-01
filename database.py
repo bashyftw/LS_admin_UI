@@ -17,6 +17,10 @@ class Controller(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     address = db.Column(db.String(64), unique=True, nullable=False)
     controller_name = db.Column(db.String(128), nullable=False)
+    led_files_synced = db.Column(db.Boolean,  default=False)
+    audio_files_synced = db.Column(db.Boolean,  default=False)
+    input_settings_synced = db.Column(db.Boolean,  default=False)
+    audio_settings_synced = db.Column(db.Boolean,  default=False)
 
 
 def round_to_second():

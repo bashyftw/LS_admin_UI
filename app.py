@@ -6,6 +6,7 @@ import os
 # Instantiate SQLAlchemy
 db = SQLAlchemy()
 
+
 def create_app():
     app = Flask(__name__)
     # bootstrap = Bootstrap5(app)
@@ -13,6 +14,7 @@ def create_app():
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(os.getcwd(), 'test.db')
     db.init_app(app)
     return app
+
 
 app = create_app()
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')

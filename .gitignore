@@ -47,4 +47,4 @@ release/
 
 
 # Generated python
-proto/*
+grpc_stuff/proto/*

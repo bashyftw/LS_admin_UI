@@ -1,14 +1,12 @@
 from app import app, socketio
 import threading
-import datetime
 import socket
 import struct
 import sys
 from routes.inputs import get_controller_by_ip
 
-sys.path.append('../proto')
-from proto import leds_pb2, audio_pb2
-from proto import inputs_pb2
+sys.path.append('../grpc_stuff/proto')
+from grpc_stuff.proto import audio_pb2, inputs_pb2, leds_pb2
 
 MULTICAST_GROUP = '224.0.0.9'
 input_data = []
@@ -17,23 +15,26 @@ audio_data = []
 history_limit = 200
 
 
-def multicast_listener(port, callback):
-    def listener(port, callback):
-        # Create the socket
-        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
-        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        sock.bind(('', port))
-
-        # Tell the operating system to add the socket to the multicast group
-        group = socket.inet_aton(MULTICAST_GROUP)
-        mreq = struct.pack('4sL', group, socket.INADDR_ANY)
-        sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
-
-        while True:
-            data, addr = sock.recvfrom(10240)
-            callback(data, addr)
-
-    threading.Thread(target=listener, args=(port, callback)).start()
+# def multicast_listener(port, callback):
+#     def listener(port, callback):
+#         # Create the socket
+#         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+#         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+#         sock.bind(('', port))
+#
+#         # Tell the operating system to add the socket to the multicast group
+#         group = socket.inet_aton(MULTICAST_GROUP)
+#         mreq = struct.pack('4sL', group, socket.INADDR_ANY)
+#         sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
+#
+#         while True:
+#             data, addr = sock.recvfrom(10240)
+#             callback(data, addr)
+#
+#     # threading.Thread(target=listener, args=(port, callback)).start()
+#     thread = threading.Thread(target=listener, args=(port, callback))
+#     thread.daemon = True
+#     thread.start()
 
 
 def input_udp2(data, addr):

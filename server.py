@@ -13,6 +13,7 @@ from routes.logs import *
 # # from routes.upd import *
 from routes.multicast import *
 from routes.files import *
+from grpc_stuff.grpc_functions import *
 
 
 @app.context_processor
@@ -82,7 +83,7 @@ if __name__ == '__main__':
     # thread = Thread(target=handle_audio)
     # thread.start()
     # multicast_listener(5555, input_udp)
-    multicast_listener(5555, input_udp2)
+    multicast_listener(5555, input_callback)
     multicast_listener(6666, led_udp)
     multicast_listener(7777, audio_udp)
     socketio.run(app, debug=True, host="0.0.0.0", port=8081)

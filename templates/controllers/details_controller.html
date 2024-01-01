@@ -241,9 +241,8 @@
                                         .then(response => response.json())
                                         .then(data => {
                                             var message = "Status: " + data.status + ", Enabled: " + data.enabled
-                                            get_services();
                                             display_message(data.name, message)
-                                            // Handle the response here
+                                            get_services();
                                             console.log(data);
                                         })
                                         .catch(error => {
@@ -268,8 +267,17 @@
                     });
             }
 
+        setInterval(function () {
+            if (controllerStatus){
+               get_services()
+            }
+
+        }, 5000);
+
 
         }
+
+
 
     </script>
 

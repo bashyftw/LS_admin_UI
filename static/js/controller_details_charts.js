@@ -86,7 +86,7 @@ function updateChart(){
     let newRAM; // replace this with your actual new RAM data
     let newTemperature; // replace this with your actual new temperature data
     let newHardDriveFreeSpace; // replace this with your actual new hard drive free space data
-    fetch('/get_cpu/' + controllerId)  // Replace with your actual URL
+    fetch('/get_controller_cpu/' + controllerId)  // Replace with your actual URL
         .then(response => response.json())  // Parse the response as JSON
         .then(data => {
             console.log(data);
@@ -132,4 +132,4 @@ setInterval(function () {
     }
 
 
-}, 2000);
+}, 3000);

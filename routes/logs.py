@@ -5,13 +5,13 @@ from app import app
 
 
 def log_event(event):
-    log = Log(event=event, username = current_user.username)
+    log = Log(event=event, username=current_user.username)
     db.session.add(log)
     db.session.commit()
     # Check the number of records
     count = Log.query.count()
     if count > 300:
-        # If more than 100 records, delete the oldest one
+        # If more than 300 records, delete the oldest one
         oldest_log = Log.query.order_by(Log.timestamp).first()
         db.session.delete(oldest_log)
         db.session.commit()

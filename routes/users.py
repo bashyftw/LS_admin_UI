@@ -43,10 +43,12 @@ class EditUserForm(FlaskForm):
     is_enabled = BooleanField('Enabled', default=True)
     submitEdit = SubmitField('Update')
 
+
 class EditPassForm(FlaskForm):
     oldPassword = PasswordField('Old Password', validators=[DataRequired()])
     newPassword = PasswordField('New Password', validators=[DataRequired()])
     submitPass = SubmitField('Update')
+
 
 @app.route('/users', methods=['GET'])
 @login_required

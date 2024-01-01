@@ -6,25 +6,39 @@ import random
 
 import sys
 
-sys.path.append('../proto')
-from proto import inputs_pb2
+from grpc_stuff.grpc_functions import *
+
+MULTICAST_GROUP = '224.0.0.9'
+
+sys.path.append('../grpc_stuff/proto')
+from grpc_stuff.proto import inputs_pb2
 
 latest_values = []
 input_states = {}
 
 
+def input_callback(data, addr):
+    with app.app_context():
+        input_cov = parse_input(data, addr)
+        if input_cov is None:
+            print("Failed to parse message.")
+            return
+
+        print(input_cov.to_dict())
+        socketio.emit('input_data', input_cov.to_dict())
+
+
 @app.route('/inputs', methods=['GET'])
 @login_required
 def inputs():
-
     return render_template('inputs/inputs.html')
+
 
 @app.route('/get_inputs/<int:controller_id>', methods=['GET'])
 def get_controller_statuses(controller_id):
     # Replace this with your actual logic to get the controller statuses
     controller_statuses = [random.choice([True, False]) for _ in range(16)]
     return jsonify(controller_statuses)
-
 
 
 @socketio.on('input_history')

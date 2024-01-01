@@ -102,7 +102,7 @@
 </div><!--//tab-content-->
 <script>
 window.onload = function() {
-    var controllers = {{ controllers.items|map(attribute='id')|list|tojson|safe }};
+    let controllers = {{ controllers.items|map(attribute='id')|list|tojson|safe }};
     controllers.forEach(function(controllerId) {
         fetch('/controller_status/' + controllerId)
             .then(response => response.json())
@@ -112,17 +112,17 @@ window.onload = function() {
                 var spinner = statusCell.querySelector('.spinner-border');
                 spinner.style.display = 'none';  // Hide the spinner
                 statusCell.textContent = data.status;
+                console.log(data.status)
             })
             .catch(error => console.error('Error:', error));
     });
 
-    var rows = document.querySelectorAll('tr[data-href]');
+    let rows = document.querySelectorAll('tr[data-href]');
     rows.forEach(function(row) {
         row.addEventListener('click', function() {
             window.location.href = row.dataset.href;
         });
     });
-    // Your existing code...
 };
 </script>
 
