@@ -1,143 +1,213 @@
-{% extends 'admin/base.html' %}
+{% extends "admin/base.html" %}
+
+
+
 {% block content %}
-    <script src="https://unpkg.com/vis@4.21.0/dist/vis.min.js"></script>
-    <link href="https://unpkg.com/vis@4.21.0/dist/vis.min.css" rel="stylesheet" type="text/css"/>
-    <script src="../../static/js/socket.io.js"></script>
     <div class="row g-3 mb-4 align-items-center justify-content-between">
         <div class="col-auto">
-            <h1 class="app-page-title mb-0">Overview</h1>
+            <h1 class="app-page-title mb-0">Audio Control</h1>
+        </div>
+        <div class="col-auto">
+
+            <a href="#" onclick="removeAudioAll()" class="btn app-btn-secondary">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                     class="bi bi-stop-circle" viewBox="0 0 16 16">
+                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                    <path d="M5 6.5A1.5 1.5 0 0 1 6.5 5h3A1.5 1.5 0 0 1 11 6.5v3A1.5 1.5 0 0 1 9.5 11h-3A1.5 1.5 0 0 1 5 9.5z"/>
+                </svg>
+                Stop All
+            </a>
+            <a class="btn app-btn-secondary" href="{{ url_for('add_controller') }}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                     class="bi bi-volume-up" viewBox="0 0 16 16">
+                    <path d="M11.536 14.01A8.47 8.47 0 0 0 14.026 8a8.47 8.47 0 0 0-2.49-6.01l-.708.707A7.48 7.48 0 0 1 13.025 8c0 2.071-.84 3.946-2.197 5.303z"/>
+                    <path d="M10.121 12.596A6.48 6.48 0 0 0 12.025 8a6.48 6.48 0 0 0-1.904-4.596l-.707.707A5.48 5.48 0 0 1 11.025 8a5.48 5.48 0 0 1-1.61 3.89z"/>
+                    <path d="M10.025 8a4.5 4.5 0 0 1-1.318 3.182L8 10.475A3.5 3.5 0 0 0 9.025 8c0-.966-.392-1.841-1.025-2.475l.707-.707A4.5 4.5 0 0 1 10.025 8M7 4a.5.5 0 0 0-.812-.39L3.825 5.5H1.5A.5.5 0 0 0 1 6v4a.5.5 0 0 0 .5.5h2.325l2.363 1.89A.5.5 0 0 0 7 12zM4.312 6.39 6 5.04v5.92L4.312 9.61A.5.5 0 0 0 4 9.5H2v-3h2a.5.5 0 0 0 .312-.11"/>
+                </svg>
+                Set Volume
+            </a>
         </div>
 
 
     </div><!--//row-->
 
 
-
     <div class="tab-content" id="orders-table-tab-content">
         <div class="tab-pane fade show active" id="orders-all" role="tabpanel" aria-labelledby="orders-all-tab">
             <div class="app-card app-card-orders-table shadow-sm mb-5">
                 <div class="app-card-body">
+                    <div class="table-responsive">
+                        <table class="table app-table-hover mb-0 text-left" id="control-table">
+                            <tbody id="control-body">
+
+                            </tbody>
+                        </table>
+                    </div><!--//table-responsive-->
+
+                </div><!--//app-card-body-->
+            </div><!--//app-card-->
 
 
-                    <div id="visualization"></div>
-                    <button id="toggleAutoScroll">Toggle Auto Scroll</button>
-
-                </div><!--//row-->
-            </div><!--//row-->
-        </div><!--//row-->
-    </div><!--//row-->
-
+        </div><!--//tab-pane-->
+    </div><!--//tab-content-->
     <script>
 
-        window.onload = function () {
-            var autoScroll = true;
+        const socket = io();
+        socket.on('audio', function (controller) {
+            console.log(controller)
+            if (controller.status == "ADDED"){
+                let newRow = document.createElement('tr');
+                newRow.id = 'audio-' + controller.file_name + '-' + controller.start_time;
+                var speaker_output = String(controller.speaker_output).replace(/99/g, "-");
+                newRow.innerHTML = `
+                    <td class="cell" width = 50%>${controller.file_name}</td>
+                    <td class="cell" width = 20%>${speaker_output}</td>
+                    <td class="cell" width = 10%>${controller.volume}</td>
+                    <td width = 10%>
+                        <a href="#" onclick="removeAudioFile(${controller.id}, '${controller.file_name}', '${controller.start_time}')" class="btn-sm app-btn-secondary">Stop</a>
+                    </td>
+                    `;
+                document.getElementById('audio-body-' + controller.id).appendChild(newRow);
+            }else if (controller.status == "REMOVED"){
+                let rowId = 'audio-' + controller.file_name + '-' + controller.start_time;
+                let rowToRemove = document.getElementById(rowId);
+                if (rowToRemove) {
+                    rowToRemove.remove();
+                }
+            }
 
-            document.getElementById('toggleAutoScroll').addEventListener('click', function () {
-                autoScroll = !autoScroll;
-            });
-            // DOM element where the Timeline will be attached
-            var container = document.getElementById('visualization');
-            // Create a DataSet (allows two way data-binding)
-            var groups = new vis.DataSet([
-                {id: 1, content: 'Speaker 1'},
-                {id: 2, content: 'Speaker 2'},
-                {id: 3, content: 'Speaker 3'},
-                {id: 4, content: 'Speaker 4'},
-            ]);
-            var items = new vis.DataSet([]);
+        });
 
-            // Configuration for the Timeline
-            var options = {
-                start: new Date(Date.now() - 1000 * 60 * 1.5),  // One hour ago
-                end: new Date(Date.now() + 1000 * 60 * 1.5),  // One hour from now
-                format: {
-                    minorLabels: {
-                        millisecond: 'x',
-                        second: 's',
-                        minute: 'HH:mm:ss',
-                        hour: 'HH:mm:ss',
-                        weekday: 'HH:mm:ss',
-                        day: 'HH:mm:ss',
-                        month: 'HH:mm:ss',
-                        year: 'HH:mm:ss'
+
+        messages = new toastr_filter("audio_messages")
+
+        function removeAudioFile(controllerId, fileName, startTime) {
+            // Construct the URL
+            const url = `/remove_audio_file/${controllerId}/${fileName}/${startTime}`;
+
+            // Send the HTTP request
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
                     }
-                }
-            };
-
-            // Create a Timeline
-            var timeline = new vis.Timeline(container, items, groups, options);
-
-            // Update the timeline every second to keep the current time in the center
-            setInterval(function () {
-                var currentTime = new Date();
-
-                // Update the content of each item to show the progress
-                items.forEach(function (item) {
-                    if (item.removed) {
-                        return;
-                    }
-                    var progress = ((currentTime - item.start) / (item.end - item.start)) * 100;
-                    progress = Math.min(Math.max(Math.round(progress), 0), 100);  // Limit progress to 100%
-                    item.content = item.file_name + ' ' + progress + '%';
-                    items.update(item);
-                });
-
-                if (autoScroll) {
-                    timeline.moveTo(currentTime, {animation: {duration: 1000, easingFunction: 'linear'}});
-                }
-            }, 1000);
-
-
-            var socket = io();
-            socket.on('connect', function () {
-                socket.emit('input_history');
-            });
-
-            socket.on('audio data', function (data) {
-
-                if (data.removed) {
-                    // Find the item with the same start time and file name
-                    var itemsToUpdate = items.get({
-                        filter: function (item) {
-                            return item.start.getTime() === data.start_time * 1000 && item.file_name === data.audio_file;
-                        }
-                    });
-
-                    // Update the items
-                    itemsToUpdate.forEach(function (item) {
-                        item.removed = true;
-                        item.style = 'background-color: red';  // Change color to red
-                        var currentTime = new Date();
-                        var progress = ((currentTime - item.start) / (item.end - item.start)) * 100;
-                        progress = Math.min(Math.max(Math.round(progress), 0), 100);  // Limit progress to 100%
-                        item.content = item.file_name + ' ' + progress + '%';
-                        items.update(item);
-                    });
-                } else {
-                    // Convert the start time to a Date object
-                    var startTime = new Date(data.start_time * 1000);
-
-                    // Calculate the end time
-                    var endTime = new Date((data.start_time + data.duration) * 1000);
-
-                    // Create a new item for each speaker
-                    data.speakers.forEach(function (speaker, index) {
-                        var item = {
-                            id: Date.now() + index,  // Generate a unique ID for each item
-                            group: speaker,
-                            file_name: data.audio_file,
-                            start: startTime,
-                            end: endTime
-                        };
-                        var currentTime = new Date();
-                        var progress = ((currentTime - item.start) / (item.end - item.start)) * 100;
-                        progress = Math.min(Math.max(Math.round(progress), 0), 100);  // Limit progress to 100%
-                        item.content = item.file_name + ' ' + progress + '%';
-                        items.add(item);
-                    });
-                }
-            });
+                })
         }
+
+        function removeAudioController(controllerId) {
+            // Construct the URL
+            const url = `/remove_audio_controller/${controllerId}`;
+
+            // Send the HTTP request
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                })
+        }
+
+        function removeAudioAll() {
+            // Construct the URL
+            const url = `/remove_audio_all`;
+
+            // Send the HTTP request
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                })
+        }
+
+        window.onload = function () {
+            fetch('/get_controllers')
+                .then(response => response.json())
+                .then(controllers => {
+                    console.log(controllers);  // Process your data here
+                    getActiveControllers(controllers)
+                })
+                .catch(error => console.error('Error:', error));
+
+
+            function getActiveControllers(controllers) {
+                controllers.forEach(function (controller) {
+                    console.log(controller)
+                    fetch('/controller_status/' + controller.id)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.status === 'RUNNING') {
+                                // Create a new row
+                                let newRow = document.createElement('tr');
+                                newRow.id = 'controller-' + controller.id;
+                                newRow.innerHTML = `
+                        <td class="cell">${controller.name}</td>
+                        <td class="cell" id = "audio-table-${controller.name}">
+                            <table class="table app-table-hover mb-0 text-left">
+                                <thead>
+                                <tr>
+                                    <th class="cell">File name</th>
+                                    <th class="cell">Speakers</th>
+                                    <th class="cell">Volume</th>
+                                    <th class="cell"></th>
+                                </tr>
+                                </thead>
+                                <tbody id= "audio-body-${controller.id}">
+
+
+                                </tbody>
+                            </table>
+                        </td>
+                        <td class="cell">
+                            <div class="d-flex flex-column">
+                                <a href="#" onclick="removeAudioController(${controller.id})" class="btn btn-sm app-btn-secondary mb-2">Stop All</a>
+                                <a href="/volume/${controller.id}" class="btn btn-sm app-btn-secondary">Volume</a>
+                            </div>
+                        </td>`;
+                                // Append the new row to the table
+                                document.getElementById('control-body').appendChild(newRow);
+                                getActiveAudio(controller)
+                            }
+                        })
+                        .catch(error => console.error('Error:', error));
+                });
+            }
+
+
+            function getActiveAudio(controller) {
+
+                fetch('/get_audio_stack_request/' + controller.id)
+                    .then(response => response.json())
+                    .then(audioFiles => {
+                        console.log(audioFiles)
+                        audioFiles.forEach(function (audio) {
+                            console.log(audio)
+                            let newRow = document.createElement('tr');
+                            newRow.id = 'audio-' + audio.file_name + '-' + audio.start_time;
+                            var speaker_output = String(audio.speaker_output).replace(/99/g, "-");
+                            newRow.innerHTML = `
+                    <td class="cell" width = 50%>${audio.file_name}</td>
+                    <td class="cell" width = 20%>${speaker_output}</td>
+                    <td class="cell" width = 10%>${audio.volume}</td>
+                    <td width = 10%>
+                        <a href="#" onclick="removeAudioFile(${controller.id}, '${audio.file_name}', '${audio.start_time}')" class="btn-sm app-btn-secondary">Stop</a>
+                    </td>
+                    `;
+                            document.getElementById('audio-body-' + controller.id).appendChild(newRow);
+                        });
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+
+
+            let rows = document.querySelectorAll('tr[data-href]');
+            rows.forEach(function (row) {
+                row.addEventListener('click', function () {
+                    window.location.href = row.dataset.href;
+                });
+            });
+        };
     </script>
+
 
 {% endblock %}

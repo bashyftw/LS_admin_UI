@@ -16,20 +16,27 @@
     {% include 'admin/nav.html' %}
 </header>
 <body class="app">
-<div class="app-wrapper">
-    <div class="app-content pt-3 p-md-3 p-lg-4">
+<script src="../../static/js/jquery-3.6.0.min.js"></script>
+<script src="../../static/js/socket.io.js"></script>
+<script src="../../static/js/toastr.min.js"></script>
+<script src="../../static/js/toastr.js"></script>
 
-        {% include 'admin/alert.html' %}
-        {% block content %}
-        {% endblock %}
-
-
-
-    </div><!--//container-fluid-->
-</div><!--//app-content-->
+    <div class="app-wrapper">
+        <div class="app-content pt-3 p-md-3 p-lg-4">
 
 
-{% include 'admin/include_js.html' %}
+            {% include 'admin/alert.html' %}
+            {% block content %}
+            {% endblock %}
+
+
+
+        </div><!--//container-fluid-->
+    </div><!--//app-content-->
+ {% include 'admin/include_js.html' %}
+</body>
+
+
 
 
 

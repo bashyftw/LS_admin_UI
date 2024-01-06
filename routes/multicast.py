@@ -3,7 +3,7 @@ import threading
 import socket
 import struct
 import sys
-from routes.inputs import get_controller_by_ip
+# from routes.inputs import get_controller_by_ip
 
 sys.path.append('../grpc_stuff/proto')
 from grpc_stuff.proto import audio_pb2, inputs_pb2, leds_pb2
@@ -37,27 +37,27 @@ history_limit = 200
 #     thread.start()
 
 
-def input_udp2(data, addr):
-    with app.app_context():
-        message = inputs_pb2.inputCOV()
-        message.ParseFromString(data)
-
-        ip = ''.join([str(element) for element in addr[0]])
-        controller = get_controller_by_ip(ip)
-
-        input_id = message.input  # Choose a random input id
-        status = inputs_pb2.OnChangeStatus.Name(message.status)
-        # dt_object = datetime.datetime.fromtimestamp(int(message.time_stamp) / 1000)
-        # timestamp = dt_object.strftime("%Y-%m-%d %H:%M:%S:%f")
-
-        input = {'ip': ip, 'input_id': input_id, 'status': status, 'timestamp': message.time_stamp,
-                 'controller_id': controller.id, 'controller_name': controller.controller_name}
-        # print(input)
-
-        input_data.append(input)
-        if len(input_data) > history_limit:  # Only keep the last 100 values
-            input_data.pop(0)
-        socketio.emit('input_data', {'input': input})
+# def input_udp2(data, addr):
+#     with app.app_context():
+#         message = inputs_pb2.inputCOV()
+#         message.ParseFromString(data)
+#
+#         ip = ''.join([str(element) for element in addr[0]])
+#         controller = get_controller_by_ip(ip)
+#
+#         input_id = message.input  # Choose a random input id
+#         status = inputs_pb2.OnChangeStatus.Name(message.status)
+#         # dt_object = datetime.datetime.fromtimestamp(int(message.time_stamp) / 1000)
+#         # timestamp = dt_object.strftime("%Y-%m-%d %H:%M:%S:%f")
+#
+#         input = {'ip': ip, 'input_id': input_id, 'status': status, 'timestamp': message.time_stamp,
+#                  'controller_id': controller.id, 'controller_name': controller.controller_name}
+#         # print(input)
+#
+#         input_data.append(input)
+#         if len(input_data) > history_limit:  # Only keep the last 100 values
+#             input_data.pop(0)
+#         socketio.emit('input_data', {'input': input})
 
 
 def led_udp(data, addr):
@@ -73,7 +73,7 @@ def led_udp(data, addr):
         universes = sorted(list(message.universes))
         led = {'ip': ip, 'file_name': message.fileName, 'status': status, 'start_time': message.start_time,
                'end_time': message.end_time, 'universes': universes, 'controller_id': controller.id,
-               'controller_name': controller.controller_name, 'timestamp': message.time_stamp}
+               'controller_name': controller.name, 'timestamp': message.time_stamp}
 
         led_data.append(led)
         if len(led_data) > history_limit:  # Only keep the last 100 values
@@ -96,7 +96,7 @@ def audio_udp(data, addr):
         # speakers = [1, 2, 3]
         audio = {'ip': ip, 'file_name': file_name, 'status': status, 'start_time': message.start_time,
                  'end_time': message.end_time, 'speakers': speakers, 'controller_id': controller.id,
-                 'controller_name': controller.controller_name, 'timestamp': message.time_stamp}
+                 'controller_name': controller.name, 'timestamp': message.time_stamp}
 
         audio_data.append(audio)
         if len(audio_data) > history_limit:

@@ -7,15 +7,15 @@ from database import Controller
 from app import app, db
 from sqlalchemy.exc import IntegrityError
 
-from grpc_stuff.grpc_functions import *
+from grpc_functions import *
+
+# from grpc_stuff.grpc_functions import set_service_operation_gprc
 from routes.logs import log_event
 import time
 
 import grpc
 import sys
 
-sys.path.append('proto')
-from grpc_stuff.proto import admin_pb2, admin_pb2_grpc
 
 from enum import Enum
 
@@ -41,7 +41,7 @@ def get_controller(controller_id):
 
 
 class ControllerForm(FlaskForm):
-    controller_name = StringField('Controller name', validators=[DataRequired()])
+    name = StringField('Controller name', validators=[DataRequired()])
     address = StringField("Ip address: ", validators=[DataRequired(), IPAddress(message="Invalid IP address!")])
     submit = SubmitField('Add/Edit Controller')
 
@@ -59,15 +59,15 @@ def controllers():
 def add_controller():
     form = ControllerForm()
     if form.validate_on_submit():
-        print(form.address, form.controller_name)
+        print(form.address, form.name)
         controller = Controller()
-        controller.controller_name = form.controller_name.data
+        controller.name = form.name.data
         controller.address = form.address.data
         db.session.add(controller)
         try:
             db.session.commit()
-            log_event('Controller added: ' + controller.controller_name)
-            flash('Controller added: ' + controller.controller_name, 'success')
+            log_event('Controller added: ' + controller.name)
+            flash('Controller added: ' + controller.name, 'success')
             return redirect(url_for('controllers'))
         except IntegrityError as e:
             print(e)
@@ -82,12 +82,12 @@ def edit_controller(controller_id):
     controller = get_controller(controller_id)
     form = ControllerForm(obj=controller)
     if form.submit.data and form.validate_on_submit():
-        controller.controller_name = form.controller_name.data
+        controller.name = form.name.data
         controller.address = form.address.data
         try:
             db.session.commit()
-            log_event('Controller updated: ' + controller.controller_name)
-            flash('Controller updated: ' + controller.controller_name, 'success')
+            log_event('Controller updated: ' + controller.name)
+            flash('Controller updated: ' + controller.name, 'success')
             return redirect(url_for('controllers'))
         except IntegrityError as e:
             db.session.rollback()
@@ -172,8 +172,8 @@ def delete_controller(controller_id):
     controller = get_controller(controller_id)
     db.session.delete(controller)
     db.session.commit()
-    log_event('Controller deleted: ' + controller.controller_name)
-    flash('Controller deleted: ' + controller.controller_name, 'success')
+    log_event('Controller deleted: ' + controller.name)
+    flash('Controller deleted: ' + controller.name, 'success')
     return redirect(url_for('controllers'))
 
 
@@ -201,7 +201,7 @@ def reboot_controller(controller_id):
     controller = get_controller(controller_id)
 
     try:
-        log_event('Controller rebooted: ' + controller.controller_name)
+        log_event('Controller rebooted: ' + controller.name)
 
         reboot(controller.address)
 
@@ -214,22 +214,28 @@ def reboot_controller(controller_id):
     return "reboot_controller"
 
 
-@app.route('/get_files/<string:folder>/<int:controller_id>')
-def get_files(folder, controller_id):
-    controller = get_controller(controller_id)
+@app.route('/get_controllers')
+def get_controllers():
+    all_controllers = Controller.query.all()
+    controllers_data = [{"id": controller.id, "name": controller.name} for controller in all_controllers]
+    return jsonify(controllers_data)
 
-    file_req = admin_pb2.fileReq()
-    file_req.folder = folder
-
-    try:
-        with grpc.insecure_channel(controller.address + ':8888') as channel:
-            stub = admin_pb2_grpc.adminServiceStub(channel)
-            response = stub.GetFiles(file_req)
-            print(response)
-
-    except grpc.RpcError as e:
-        return jsonify({'status': "Error"})
-        print(e.code())
-        print(e.details())
-
-    return "get_files"
+# @app.route('/get_files/<string:folder>/<int:controller_id>')
+# def get_files(folder, controller_id):
+#     controller = get_controller(controller_id)
+#
+#     file_req = admin_pb2.fileReq()
+#     file_req.folder = folder
+#
+#     try:
+#         with grpc.insecure_channel(controller.address + ':8888') as channel:
+#             stub = admin_pb2_grpc.adminServiceStub(channel)
+#             response = stub.GetFiles(file_req)
+#             print(response)
+#
+#     except grpc.RpcError as e:
+#         return jsonify({'status': "Error"})
+#         print(e.code())
+#         print(e.details())
+#
+#     return "get_files"
